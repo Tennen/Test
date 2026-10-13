@@ -6,6 +6,8 @@ let answers=Object.fromEntries(Object.entries(saved.answers&&typeof saved.answer
 let stars=new Set((Array.isArray(saved.stars)?saved.stars:[]).filter(id=>questionIds.has(id)));
 // Store only question IDs. Migrate earlier latest-answer-based wrong lists once.
 let wrongIds=new Set((Array.isArray(saved.wrongIds)?saved.wrongIds:ALL.filter(q=>answers[q.id]&&answers[q.id]!==q.answer).map(q=>q.id)).filter(id=>questionIds.has(id)));
+// Reconcile mastered entries retained by older versions in other practice modes.
+for(const q of ALL)if(answers[q.id]===q.answer)wrongIds.delete(q.id);
 let errorCounts=Object.fromEntries(Object.entries(saved.errorCounts&&typeof saved.errorCounts==='object'?saved.errorCounts:{}).filter(([id,n])=>questionIds.has(id)&&Number.isSafeInteger(n)&&n>0));
 const frequentIds=new Set(ALL.filter(q=>errorCounts[q.id]>3).map(q=>q.id));
 let paper=saved.paper||'all',mode=saved.mode||'all',index=0,visible=[],revealed=false,reviewAnswers={},autoAdvanceTimer=null,autoAdvanceSerial=0,correctPending=false,wrongRecorded=false;
